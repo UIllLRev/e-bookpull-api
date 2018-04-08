@@ -1,0 +1,8 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /members/apiv2/
+RewriteRule ^import.* import.php [L]
+RewriteRule ^upload.* upload.php [L]
+RewriteRule ^dispatch\.fcgi/ - [L]
+RewriteRule ^(.*)$ dispatch.fcgi/$1 [L]
+</IfModule>
