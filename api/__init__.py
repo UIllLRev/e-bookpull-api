@@ -60,16 +60,16 @@ class WorkSchema(Schema):
         self_view_many = 'work_list'
 
     id = fields.Integer(as_string=True, dump_only=True, attribute='author_code')
-    author = fields.Str(attribute='author_name')
-    title = fields.Str(attribute='article_name')
-    volume = fields.Integer(as_string=True)
-    issue = fields.Integer(as_string=True)
-    comments = fields.Str()
-    bookpuller = fields.Str()
+    author = fields.Str(attribute='author_name', allow_none=True)
+    title = fields.Str(attribute='article_name', allow_none=True)
+    volume = fields.Integer(as_string=True, allow_none=True)
+    issue = fields.Integer(as_string=True, allow_none=True)
+    comments = fields.Str(allow_none=True)
+    bookpuller = fields.Str(allow_none=True)
     sources = Relationship(self_view='work_sources',
             self_view_kwargs={'id': '<author_code>'},
             related_view='source_list',
-            related_view_kwargs={'author_code': '<author_code>'},
+            related_view_kwargs={'id': '<author_code>'},
             many=True,
             schema='SourceSchema',
             type_='source')
@@ -98,20 +98,26 @@ class SourceSchema(Schema):
         self_view_many = 'source_list'
 
     id = fields.Integer(as_string=True, dump_only=True)
-    author_code = fields.Integer(as_string=True)
+    work = fields.Integer(as_string=True, dump_only=True, attribute='author_code')
     type = fields.Str()
     citation = fields.Str()
-    citation = fields.Str()
-    url = fields.Str()
-    comments = fields.Str()
-    ordered = fields.Date()
+    url = fields.Str(allow_none=True)
+    comments = fields.Str(allow_none=True)
+    ordered = fields.Date(allow_none=True)
     status = fields.Str(attribute='status_code')
 
 # Create resource managers
 class SourceList(ResourceList):
+    def query(self, view_kwargs):
+        if view_kwargs.get('id') is not None:
+            return self.session.query(Source).filter_by(author_code=view_kwargs['id'])
+        return self.session.query(Source)
+
     schema = SourceSchema
     data_layer = {'session': db.session,
-                  'model': Source}
+                  'model': Source,
+                  'methods': {'query': query}
+                  }
 
 class SourceDetail(ResourceDetail):
     schema = SourceSchema
@@ -123,7 +129,7 @@ api = Api(app)
 api.route(WorkList, 'work_list', '/works')
 api.route(WorkDetail, 'work_detail', '/works/<int:id>')
 api.route(WorkSourcesRelationship, 'work_sources', '/works/<int:id>/relationships/sources')
-api.route(SourceList, 'source_list', '/sources')
+api.route(SourceList, 'source_list', '/sources', '/works/<int:id>/sources')
 api.route(SourceDetail, 'source_detail', '/sources/<int:id>')
 
 # Start the flask loop
