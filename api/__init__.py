@@ -1,6 +1,7 @@
 #!/home/ilr_dev/dev.illinoislawreview.org/members/apiv2/bin/python
 # -*- coding: utf-8 -*-
 
+import os
 from flask import Flask
 from flask_rest_jsonapi import Api, ResourceDetail, ResourceList, ResourceRelationship
 from flask_sqlalchemy import SQLAlchemy
@@ -8,14 +9,20 @@ from marshmallow_jsonapi.flask import Schema, Relationship
 from marshmallow_jsonapi import fields
 from sqlalchemy import Column, Date, ForeignKey, Integer, SmallInteger, String, Text
 from sqlalchemy.dialects.mysql import ENUM
-#from sqlalchemy.ext.declarative import declarative_base
+
+from werkzeug.wrappers import Response
 
 # Create the Flask application and the Flask-SQLAlchemy object.
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
-#Base = declarative_base()
+@app.after_request
+def add_cors_headers(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', '*')
+    response.headers.add('Access-Control-Allow-Methods', '*')
+    return response
 
 class Work(db.Model):
     __tablename__ = 'works'
@@ -65,7 +72,7 @@ class WorkSchema(Schema):
             related_view_kwargs={'author_code': '<author_code>'},
             many=True,
             schema='SourceSchema',
-            type='source')
+            type_='source')
 
 # Create resource managers
 class WorkList(ResourceList):
@@ -78,7 +85,7 @@ class WorkDetail(ResourceDetail):
     data_layer = {'session': db.session,
                   'model': Work}
 
-class WorkRelationship(ResourceRelationship):
+class WorkSourcesRelationship(ResourceRelationship):
     schema = WorkSchema 
     data_layer = {'session': db.session,
                   'model': Work}
@@ -98,7 +105,7 @@ class SourceSchema(Schema):
     url = fields.Str()
     comments = fields.Str()
     ordered = fields.Date()
-    status_code = fields.Str()
+    status = fields.Str(attribute='status_code')
 
 # Create resource managers
 class SourceList(ResourceList):
@@ -115,10 +122,11 @@ class SourceDetail(ResourceDetail):
 api = Api(app)
 api.route(WorkList, 'work_list', '/works')
 api.route(WorkDetail, 'work_detail', '/works/<int:id>')
-api.route(WorkRelationship, 'work_sources', '/works/<int:id>/relationships/sources')
+api.route(WorkSourcesRelationship, 'work_sources', '/works/<int:id>/relationships/sources')
 api.route(SourceList, 'source_list', '/sources')
 api.route(SourceDetail, 'source_detail', '/sources/<int:id>')
 
 # Start the flask loop
 if __name__ == '__main__':
+    app.config['DEBUG'] = True
     app.run()
