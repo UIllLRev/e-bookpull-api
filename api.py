@@ -1,4 +1,4 @@
-#!/home/ilr_dev/dev.illinoislawreview.org/members/apiv2/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import os
