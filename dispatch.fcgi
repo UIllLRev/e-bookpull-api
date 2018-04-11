@@ -1,7 +1,10 @@
-#!/home/ilr_dev/dev.illinoislawreview.org/members/apiv2/bin/python
+#!/usr/bin/python
+
+from config import do_config
+do_config()
 
 from fcgi import WSGIServer
-from api import app
+from e_bookpull_api import app
 
 class ScriptNameStripper(object):
    def __init__(self, app):
