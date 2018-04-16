@@ -1,5 +1,10 @@
+import sys
 import os
 from setuptools import setup
+
+base = os.path.dirname(os.path.abspath(__file__))
+site_packages = os.path.join(base, 'lib', 'python%s' % sys.version[:3], 'site-packages')
+os.environ['PYTHONPATH'] = site_packages
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
