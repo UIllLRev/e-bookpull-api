@@ -1,0 +1,5 @@
+Flask-REST-JSONAPI
+Flask-MySQLdb
+Flask-SQLAlchemy
+python-dotenv
+raven[flask]
