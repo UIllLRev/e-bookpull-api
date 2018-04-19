@@ -28,6 +28,9 @@ setup(
     ],
     install_requires=[
         'Flask-REST-JSONAPI',
-        'Flask-MySQLdb'
+        'Flask-MySQLdb',
+        'Flask-SQLAlchemy',
+        'python-dotenv',
+        'raven[flask]'
     ]
 )
