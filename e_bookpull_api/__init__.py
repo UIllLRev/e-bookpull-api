@@ -9,6 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 # Create the Flask application and the Flask-SQLAlchemy object.
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['JSONIFY_MIMETYPE'] = 'application/vnd.api+json'
 db = SQLAlchemy(app)
 
 from models import Work, Source
