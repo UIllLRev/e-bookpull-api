@@ -20,7 +20,10 @@ from raven import Client, fetch_git_sha
 from raven.contrib.flask import Sentry
 import_route = ImportRoute(app)
 upload_route = UploadRoute(app, os.environ['UPLOAD_PATH'])
-sentry = Sentry(app, client=Client(release=fetch_git_sha(os.path.dirname(__file__))))
+sentry = Sentry(app, client=Client(
+    release=fetch_git_sha(os.path.dirname(__file__)),
+    environment = os.getenv('ENVIRONMENT')
+    ))
 
 class ScriptNameStripper(object):
    def __init__(self, app):
