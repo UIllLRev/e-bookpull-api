@@ -16,10 +16,11 @@ load_dotenv()
 from e_bookpull_api import app
 from e_bookpull_api.import_route import ImportRoute
 from e_bookpull_api.upload_route import UploadRoute
+from raven import Client, fetch_git_sha
 from raven.contrib.flask import Sentry
 import_route = ImportRoute(app)
 upload_route = UploadRoute(app, os.environ['UPLOAD_PATH'])
-sentry = Sentry(app)
+sentry = Sentry(app, client=Client(release=fetch_git_sha(os.path.dirname(__file__))))
 
 class ScriptNameStripper(object):
    def __init__(self, app):
