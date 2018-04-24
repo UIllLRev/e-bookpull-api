@@ -33,10 +33,13 @@ class SourceSchema(Schema):
         self_view_many = 'source_list'
 
     id = fields.Integer(as_string=True, dump_only=True)
-    work = fields.Integer(as_string=True, dump_only=True, attribute='author_code')
     type = fields.Str()
     citation = fields.Str()
     url = fields.Str(allow_none=True)
     comments = fields.Str(allow_none=True)
     ordered = fields.Date(allow_none=True)
     status = fields.Str(attribute='status_code')
+    work = Relationship(related_view='work_detail',
+            related_view_kwargs={'id': '<author_code>'},
+            schema='WorkSchema',
+            type_='work')
