@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python -O
 
 # Load packages from our local directory
 import sys
