@@ -9,7 +9,7 @@ class WorkSchema(Schema):
         self_view_kwargs = {'id': '<id>'}
         self_view_many = 'work_list'
 
-    id = fields.Integer(as_string=True, dump_only=True, attribute='author_code')
+    id = fields.Integer(as_string=True, dump_only=True)
     author = fields.Str(attribute='author_name', allow_none=True)
     title = fields.Str(attribute='article_name', allow_none=True)
     volume = fields.Integer(as_string=True, allow_none=True)
@@ -17,9 +17,9 @@ class WorkSchema(Schema):
     comments = fields.Str(allow_none=True)
     bookpuller = fields.Str(allow_none=True)
     sources = Relationship(self_view='work_sources',
-            self_view_kwargs={'id': '<author_code>'},
+            self_view_kwargs={'id': '<id>'},
             related_view='source_list',
-            related_view_kwargs={'id': '<author_code>'},
+            related_view_kwargs={'id': '<id>'},
             many=True,
             schema='SourceSchema',
             type_='source')

@@ -5,7 +5,7 @@ from .. import db
 class Work(db.Model):
     __tablename__ = 'works'
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_charset':'utf8'}
-    author_code = Column(Integer, primary_key=True)
+    id = Column('author_code', Integer, primary_key=True)
     author_name = Column(String(80))
     article_name = Column(Text)
     volume = Column(SmallInteger)
