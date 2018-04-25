@@ -37,4 +37,11 @@ app.wsgi_app = ScriptNameStripper(app.wsgi_app)
 
 if __name__ == '__main__':
     from fcgi import WSGIServer
-    WSGIServer(app.wsgi_app).run()
+    class MyWSGIServer(WSGIServer):
+        def error(self, req):
+            """
+            Override default implementation which prints a traceback.
+            """
+            req.stdout.write('Content-Type: application/vnd.api+json\r\n\r\n{"errors": [{"status": "500", "detail": "Unknown error.", "title": "Unknown Error"}],"jsonapi": {"version": "1.0"}}')
+
+    MyWSGIServer(app.wsgi_app).run()
