@@ -19,7 +19,7 @@ from e_bookpull_api.upload_route import UploadRoute
 from raven import Client, fetch_git_sha
 from raven.contrib.flask import Sentry
 import_route = ImportRoute(app)
-upload_route = UploadRoute(app, os.environ['UPLOAD_PATH'])
+upload_route = UploadRoute(app, os.environ['UPLOAD_DIR'], os.environ['UPLOAD_PATH'])
 sentry = Sentry(app, client=Client(
     release=fetch_git_sha(os.path.dirname(__file__)),
     environment = os.getenv('ENVIRONMENT')

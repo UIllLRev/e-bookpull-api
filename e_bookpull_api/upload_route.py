@@ -17,19 +17,18 @@ def mkdir_p(path):
             raise
 
 class UploadRoute:
-    def __init__(self, app, upload_path): 
+    def __init__(self, app, upload_dir, upload_path):
         @app.route('/upload/<int:work_id>', methods=['POST'])
         def upload(work_id):
             if 'file' in request.files:
                 work = Work.query.get(work_id)
                 if work:
                     f = request.files['file']
-                    target_dir = os.path.join(upload_path, work.author_name)
-                    root = os.path.commonprefix([os.path.abspath(target_dir), os.path.abspath(request.environ['SCRIPT_NAME'])])
+                    target_dir = os.path.join(upload_dir, work.author_name)
                     mkdir_p(target_dir)
                     filename = os.path.join(target_dir, datetime.now().strftime("%Y-%m-%d_%H-%M-%S_") + secure_filename(f.filename))
                     f.save(filename)
-                    return json.dumps({"url": os.path.relpath(filename, root)}), 200, {"Content-Type": "application/vnd.api+json"}
+                    return json.dumps({"url": os.path.join(upload_path, os.path.relpath(filename, upload_dir))}), 200, {"Content-Type": "application/vnd.api+json"}
                 return json.dumps({
                     "errors": [{"status": "400", "detail": "Invalid work id.", "title": "Bad request"}],
                     "jsonapi": {"version": "1.0"}
