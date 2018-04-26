@@ -12,7 +12,7 @@ class ImportRoute:
                 f = request.files['file']
                 sources = json.load(f)
                 for source in sources:
-                    s = Source(author_code=work.author_code, type=source["type"], citation=source["citation"])
+                    s = Source(work_id=work.id, type=source["type"], citation=source["citation"])
                     db.session.add(s)
                 db.session.commit()
                 return '', 204

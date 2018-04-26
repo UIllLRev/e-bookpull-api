@@ -5,7 +5,7 @@ from .. import db
 class Work(db.Model):
     __tablename__ = 'works'
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_charset':'utf8'}
-    id = Column('author_code', Integer, primary_key=True)
+    id = Column('author_code', Integer, primary_key=True, key='id')
     author_name = Column(String(80))
     article_name = Column(Text)
     volume = Column(SmallInteger)
@@ -18,7 +18,7 @@ class Source(db.Model):
     __tablename__ = 'sources'
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_charset':'utf8'}
     id = Column(Integer, primary_key=True)
-    author_code = Column(Integer, ForeignKey('works.author_code'), nullable=False)
+    work_id = Column('author_code', Integer, ForeignKey('works.id'), nullable=False, key='work_id')
     type = Column(ENUM('B', 'C', 'J', 'L', 'M', 'P'), index=True)
     citation = Column(Text)
     url = Column(Text)

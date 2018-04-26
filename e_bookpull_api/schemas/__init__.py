@@ -40,6 +40,6 @@ class SourceSchema(Schema):
     ordered = fields.Date(allow_none=True)
     status = fields.Str(attribute='status_code')
     work = Relationship(related_view='work_detail',
-            related_view_kwargs={'id': '<author_code>'},
+            related_view_kwargs={'id': '<work_id>'},
             schema='WorkSchema',
             type_='work')

@@ -47,7 +47,7 @@ class WorkSourcesRelationship(ResourceRelationship):
 class SourceList(ResourceList):
     def query(self, view_kwargs):
         if view_kwargs.get('id') is not None:
-            return self.session.query(Source).filter_by(author_code=view_kwargs['id'])
+            return self.session.query(Source).filter_by(work_id=view_kwargs['id'])
         return self.session.query(Source)
 
     schema = SourceSchema
