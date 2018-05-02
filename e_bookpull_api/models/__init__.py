@@ -25,4 +25,4 @@ class Source(db.Model):
     comments = Column(Text)
     ordered = Column(Date)
     status_code = Column(ENUM('N', 'E', 'M', 'R', 'X', 'XP', 'XR'), default='N', index=True)
-    work = db.relationship('Work', backref=db.backref('sources'))
+    work = db.relationship('Work', backref=db.backref('sources', cascade="all,delete"))
