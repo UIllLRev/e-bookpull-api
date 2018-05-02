@@ -38,6 +38,12 @@ class WorkDetail(ResourceDetail):
     data_layer = {'session': db.session,
                   'model': Work}
 
+    def before_delete(self, args, kwargs):
+        obj = self._data_layer.get_object(kwargs)
+        path = os.path.join(os.environ['UPLOAD_DIR'], obj.author_name)
+        if os.path.isdir(path):
+            os.rename(path, path + '.deleted')
+
 class WorkSourcesRelationship(ResourceRelationship):
     schema = WorkSchema 
     data_layer = {'session': db.session,
