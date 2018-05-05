@@ -9,8 +9,11 @@ from flask_sqlalchemy import SQLAlchemy
 # Create the Flask application and the Flask-SQLAlchemy object.
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+# This is deprecated apparently. Set to suppress warning.
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Flask's jsonify appends a Content-Type. Make it the right one.
 app.config['JSONIFY_MIMETYPE'] = 'application/vnd.api+json'
+# Set a large page size so we (generally) get all our data in one call.
 app.config['PAGE_SIZE'] = 500
 db = SQLAlchemy(app)
 

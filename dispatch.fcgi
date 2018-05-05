@@ -30,8 +30,13 @@ class ScriptNameStripper(object):
        self.app = app
 
    def __call__(self, environ, start_response):
+       # Both Flask's jsonify and Flask-REST-JSONAPI add a Content-Type header.
+       # This is a quick and easy hack to suppress duplicate headers.
+       def real_start_response(status, headers):
+           headers = set(headers)
+           return start_response(status, headers)
        environ['SCRIPT_NAME'] = '/'.join(environ['SCRIPT_NAME'].split('/')[:-1])
-       return self.app(environ, start_response)
+       return self.app(environ, real_start_response)
 
 app.wsgi_app = ScriptNameStripper(app.wsgi_app)
 
