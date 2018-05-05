@@ -22,7 +22,7 @@ import_route = ImportRoute(app)
 upload_route = UploadRoute(app, os.environ['UPLOAD_DIR'], os.environ['UPLOAD_PATH'])
 sentry = Sentry(app, client=Client(
     release=fetch_git_sha(os.path.dirname(__file__)),
-    environment = os.getenv('ENVIRONMENT')
+    environment = app.config['ENV']
     ))
 
 class ScriptNameStripper(object):
