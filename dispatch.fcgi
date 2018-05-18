@@ -25,6 +25,18 @@ sentry = Sentry(app, client=Client(
     environment = app.config['ENV']
     ))
 
+# TODO: determine if Sentry integration with Flask logging
+# is a better way to do this
+from werkzeug.exceptions import HTTPException
+@app.errorhandler(HTTPException)
+def send_http_errors_to_sentry(e):
+    sentry.captureMessage(e.name,
+            extra={
+                'description': e.get_description(),
+                'headers': e.get_headers()
+                })
+    return e.get_response(), e.code
+
 class ScriptNameStripper(object):
    def __init__(self, app):
        self.app = app
