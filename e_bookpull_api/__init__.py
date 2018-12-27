@@ -37,9 +37,23 @@ class WorkList(ResourceList):
                   'model': Work}
 
 class WorkDetail(ResourceDetail):
+    def before_get_object(self, view_kwargs):
+        if view_kwargs.get('source_id') is not None:
+            try:
+                source = self.session.query(Source).filter_by(id=view_kwargs['source_id']).one()
+            except NoResultFound:
+                raise ObjectNotFound({'parameter': 'source_id'},
+                                     "Source: {} not found".format(view_kwargs['source_id']))
+            else:
+                if source.work is not None:
+                    view_kwargs['id'] = source.work.id
+                else:
+                    view_kwargs['id'] = None
+
     schema = WorkSchema
     data_layer = {'session': db.session,
-                  'model': Work}
+                  'model': Work,
+                  'methods': {'before_get_object': before_get_object}}
 
     def before_delete(self, args, kwargs):
         obj = self._data_layer.get_object(kwargs)
@@ -48,7 +62,7 @@ class WorkDetail(ResourceDetail):
             os.rename(path, path + '.deleted')
 
 class WorkSourcesRelationship(ResourceRelationship):
-    schema = WorkSchema 
+    schema = WorkSchema
     data_layer = {'session': db.session,
                   'model': Work}
 
@@ -62,10 +76,14 @@ class SourceList(ResourceList):
     schema = SourceSchema
     data_layer = {'session': db.session,
                   'model': Source,
-                  'methods': {'query': query}
-                  }
+                  'methods': {'query': query}}
 
 class SourceDetail(ResourceDetail):
+    schema = SourceSchema
+    data_layer = {'session': db.session,
+                  'model': Source}
+
+class SourceWorkRelationship(ResourceRelationship):
     schema = SourceSchema
     data_layer = {'session': db.session,
                   'model': Source}
@@ -73,7 +91,8 @@ class SourceDetail(ResourceDetail):
 # Create the API object
 api = Api(app)
 api.route(WorkList, 'work_list', '/works')
-api.route(WorkDetail, 'work_detail', '/works/<int:id>')
+api.route(WorkDetail, 'work_detail', '/works/<int:id>', '/sources/<int:source_id>/work')
 api.route(WorkSourcesRelationship, 'work_sources', '/works/<int:id>/relationships/sources')
 api.route(SourceList, 'source_list', '/sources', '/works/<int:id>/sources')
 api.route(SourceDetail, 'source_detail', '/sources/<int:id>')
+api.route(SourceWorkRelationship, 'source_work', '/sources/<int:id>/relationships/work')

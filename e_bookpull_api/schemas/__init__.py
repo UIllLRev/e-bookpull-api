@@ -39,7 +39,9 @@ class SourceSchema(Schema):
     comments = fields.Str(allow_none=True)
     ordered = fields.Date(allow_none=True)
     status = fields.Str(attribute='status_code')
-    work = Relationship(related_view='work_detail',
-            related_view_kwargs={'id': '<work_id>'},
+    work = Relationship(self_view='source_work',
+            self_view_kwargs={'id': '<id>'},
+            related_view='work_detail',
+            related_view_kwargs={'source_id': '<id>'},
             schema='WorkSchema',
             type_='work')
