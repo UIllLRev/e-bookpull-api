@@ -60,6 +60,9 @@ class WorkDetail(ResourceDetail):
         path = os.path.join(os.environ['UPLOAD_DIR'], obj.author_name)
         if os.path.isdir(path):
             os.rename(path, path + '.deleted')
+        path = os.path.join(os.environ['UPLOAD_DIR'], str(obj.id) + '-' + obj.author_name)
+        if os.path.isdir(path):
+            os.rename(path, path + '.deleted')
 
 class WorkSourcesRelationship(ResourceRelationship):
     schema = WorkSchema

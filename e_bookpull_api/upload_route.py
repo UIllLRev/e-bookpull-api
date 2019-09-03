@@ -24,7 +24,7 @@ class UploadRoute:
                 work = Work.query.get(work_id)
                 if work:
                     f = request.files['file']
-                    target_dir = os.path.join(upload_dir, work.author_name)
+                    target_dir = os.path.join(upload_dir, str(work.id) + '-' + work.author_name)
                     mkdir_p(target_dir)
                     filename = os.path.join(target_dir, datetime.now().strftime("%Y-%m-%d_%H-%M-%S_") + secure_filename(f.filename))
                     f.save(filename)
