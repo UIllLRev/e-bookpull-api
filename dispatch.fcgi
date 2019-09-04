@@ -12,29 +12,29 @@ site.addsitedir(site_packages)
 from dotenv import load_dotenv
 load_dotenv()
 
-# Configure Sentry
 from e_bookpull_api import app
 from e_bookpull_api.import_route import ImportRoute
 from e_bookpull_api.upload_route import UploadRoute
-from raven import Client, fetch_git_sha
-from raven.contrib.flask import Sentry
 import_route = ImportRoute(app)
 upload_route = UploadRoute(app, os.environ['UPLOAD_DIR'], os.environ['UPLOAD_PATH'])
-sentry = Sentry(app, client=Client(
-    release=fetch_git_sha(os.path.dirname(__file__)),
-    environment = app.config['ENV']
-    ))
+
+# Configure Sentry
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+from raven import fetch_git_sha
+sentry_sdk.init(
+        integrations=[FlaskIntegration()],
+        release=fetch_git_sha(os.path.dirname(__file__)),
+        environment = app.config['ENV']
+        )
+
 
 # TODO: determine if Sentry integration with Flask logging
 # is a better way to do this
 from werkzeug.exceptions import HTTPException
 @app.errorhandler(HTTPException)
 def send_http_errors_to_sentry(e):
-    sentry.captureMessage(e.name,
-            extra={
-                'description': e.get_description(),
-                'headers': e.get_headers()
-                })
+    sentry_sdk.capture_exception(e)
     return e.get_response(), e.code
 
 class ScriptNameStripper(object):
