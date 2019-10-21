@@ -42,6 +42,7 @@ class SourceSchema(Schema):
     work = Relationship(self_view='source_work',
             self_view_kwargs={'id': '<id>'},
             related_view='work_detail',
-            related_view_kwargs={'source_id': '<id>'},
+            related_view_kwargs={'id': '<work.id>'},
             schema='WorkSchema',
+            include_resource_linkage=True,
             type_='work')
