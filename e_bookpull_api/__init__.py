@@ -17,8 +17,8 @@ app.config['JSONIFY_MIMETYPE'] = 'application/vnd.api+json'
 app.config['PAGE_SIZE'] = 500
 db = SQLAlchemy(app)
 
-from models import Work, Source
-from schemas import WorkSchema, SourceSchema
+from .models import Work, Source
+from .schemas import WorkSchema, SourceSchema
 db.create_all()
 
 @app.after_request
