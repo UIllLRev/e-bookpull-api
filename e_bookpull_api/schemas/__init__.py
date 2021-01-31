@@ -1,5 +1,15 @@
 from marshmallow_jsonapi.flask import Schema, Relationship
 from marshmallow_jsonapi import fields
+from base64 import b64decode
+
+class Base64Field(fields.Field):
+    def _serialize(self, value, attr, obj, **kwargs):
+        return value
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        if isinstance(value, dict) and value['encoding'] == 'base64':
+            return b64decode(value['data'])
+        return value
 
 # Create schema
 class WorkSchema(Schema):
@@ -11,10 +21,10 @@ class WorkSchema(Schema):
 
     id = fields.Integer(as_string=True, dump_only=True)
     author = fields.Str(attribute='author_name', allow_none=True)
-    title = fields.Str(attribute='article_name', allow_none=True)
+    title = Base64Field(attribute='article_name', allow_none=True)
     volume = fields.Integer(as_string=True, allow_none=True)
     issue = fields.Integer(as_string=True, allow_none=True)
-    comments = fields.Str(allow_none=True)
+    comments = Base64Field(allow_none=True)
     bookpuller = fields.Str(allow_none=True)
     sources = Relationship(self_view='work_sources',
             self_view_kwargs={'id': '<id>'},
@@ -32,11 +42,12 @@ class SourceSchema(Schema):
         self_view_kwargs = {'id': '<id>'}
         self_view_many = 'source_list'
 
+
     id = fields.Integer(as_string=True, dump_only=True)
     type = fields.Str()
-    citation = fields.Str()
+    citation = Base64Field()
     url = fields.Str(allow_none=True)
-    comments = fields.Str(allow_none=True)
+    comments = Base64Field(allow_none=True)
     ordered = fields.Date(allow_none=True)
     status = fields.Str(attribute='status_code')
     work = Relationship(self_view='source_work',
