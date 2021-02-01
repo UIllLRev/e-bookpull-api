@@ -8,7 +8,7 @@ class Base64Field(fields.Field):
 
     def _deserialize(self, value, attr, data, **kwargs):
         if isinstance(value, dict) and value['encoding'] == 'base64':
-            return b64decode(value['data'])
+            return b64decode(value['data']).decode()
         return value
 
 # Create schema
