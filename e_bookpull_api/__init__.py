@@ -4,7 +4,9 @@
 import os
 from flask import Flask
 from flask_rest_jsonapi import Api, ResourceDetail, ResourceList, ResourceRelationship
+from flask_rest_jsonapi.exceptions import ObjectNotFound
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm.exc import NoResultFound
 
 # Create the Flask application and the Flask-SQLAlchemy object.
 app = Flask(__name__)
@@ -50,6 +52,13 @@ class WorkDetail(ResourceDetail):
                 else:
                     view_kwargs['id'] = None
 
+        if view_kwargs.get('id') is not None:
+            try:
+                work = self.session.query(Work).filter_by(id=view_kwargs['id']).one()
+            except NoResultFound:
+                raise ObjectNotFound({'parameter': 'id'},
+                                     "Work: {} not found".format(view_kwargs['id']))
+
     schema = WorkSchema
     data_layer = {'session': db.session,
                   'model': Work,
@@ -74,6 +83,7 @@ class SourceList(ResourceList):
     def query(self, view_kwargs):
         if view_kwargs.get('id') is not None:
             return self.session.query(Source).filter_by(work_id=view_kwargs['id'])
+
         return self.session.query(Source)
 
     schema = SourceSchema
@@ -82,9 +92,17 @@ class SourceList(ResourceList):
                   'methods': {'query': query}}
 
 class SourceDetail(ResourceDetail):
+    def before_get_object(self, view_kwargs):
+        if view_kwargs.get('id') is not None:
+            try:
+                source = self.session.query(Source).filter_by(id=view_kwargs['id']).one()
+            except NoResultFound:
+                raise ObjectNotFound({'parameter': 'id'},
+                                     "Source: {} not found".format(view_kwargs['id']))
     schema = SourceSchema
     data_layer = {'session': db.session,
-                  'model': Source}
+                  'model': Source,
+                  'methods': {'before_get_object': before_get_object}}
 
 class SourceWorkRelationship(ResourceRelationship):
     schema = SourceSchema
